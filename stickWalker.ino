@@ -8,9 +8,11 @@
 Adafruit_BNO055 bno = Adafruit_BNO055(55); 
 
 #define LED_PIN D7
-#define POT_PIN A0 
+#define SOUND_PIN D5 
 #define NUMPIXELS 60
-
+int i;
+int soundSensor;
+int statusSensor = 0;
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 int delayval = 500; // delay for half a second
@@ -20,6 +22,7 @@ void setup(void) {
   Serial.begin(9600);
   Serial.println("Orientation Sensor Test"); Serial.println("");
   pixels.begin(); // This initializes the NeoPixel library.
+  pinMode(SOUND_PIN,INPUT);
   
 // if BNO was found
     if(!bno.begin())
@@ -45,11 +48,17 @@ void loop(void) {
   Serial.print("\tZ: ");
   Serial.print(event.orientation.z, 4);
   Serial.println("");
+  statusSensor = digitalRead (soundSensor);
+  Serial.println(statusSensor);
+
+  if (statusSensor == 1) {
   // For a set of NeoPixels the first NeoPixel is 0, second is 1, all the way up to the count of pixels minus one.
-    for(int i=0;i<NUMPIXELS;i++){
+    for(i=0;i<NUMPIXELS;i++){
     pixels.setPixelColor(i, pixels.Color(event.orientation.x,event.orientation.y,event.orientation.z)); // Moderately bright green color.
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    }
+  } else {
+    pixels.setPixelColor(i, pixels.Color(0,0,0)); // Moderately bright green color.
     pixels.show(); // This sends the updated pixel color to the hardware.
   }
 }
-
-
